@@ -312,7 +312,45 @@
         .why-text {
             font-size: 0.9rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+        
+        .why-text-content {
+            display: block;
+        }
+        
+        .why-text-content.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .why-toggle {
+            background: none;
+            border: none;
+            color: var(--sol-purple);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 0 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+        
+        .why-toggle:hover {
+            color: var(--sol-green);
+        }
+        
+        .why-toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .why-toggle.expanded .why-toggle-icon {
+            transform: rotate(180deg);
         }
         
         /* Evidence Pills */
@@ -534,11 +572,11 @@
                         <div class="stat-label">Active Narratives</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">66</div>
+                        <div class="stat-value">69</div>
                         <div class="stat-label">Signals Analyzed</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">3,126</div>
+                        <div class="stat-value">3,224</div>
                         <div class="stat-label">Network TPS</div>
                     </div>
                     <div class="stat-card">
@@ -546,7 +584,7 @@
                         <div class="stat-label">Stablecoin TVL</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">09:43</div>
+                        <div class="stat-value">09:48</div>
                         <div class="stat-label">Last Updated (UTC)</div>
                     </div>
                 </div>
@@ -573,14 +611,14 @@
                     </div>
                     <div class="metric">
                         <span>Signals:</span>
-                        <span class="metric-value">13</span>
+                        <span class="metric-value">14</span>
                     </div>
                     <span class="momentum-badge momentum-rising">📈 Rising</span>
                 </div>
                 
                 <div class="strength-bar-container">
                     <div class="strength-bar">
-                        <div class="strength-fill" style="width: 88.76599999999999%"></div>
+                        <div class="strength-fill" style="width: 88.81%"></div>
                     </div>
                     <div class="strength-labels">
                         <span>Signal Strength</span>
@@ -590,20 +628,26 @@
                 
                 <div class="why-section">
                     <div class="why-title">🎯 Why This Narrative is Emerging</div>
-                    <div class="why-text">Aggregation layer becoming essential infrastructure. Perp demand from CEX refugees. Liquid staking wars driving innovation and yield competition.
+                    <div class="why-text">
+                        <span class="why-text-content collapsed">Aggregation layer becoming essential infrastructure. Perp demand from CEX refugees. Liquid staking wars driving innovation and yield competition.
 
 **Key Drivers:**
 • Aggregation layer becoming essential. Perp demand from CEX refugees. DAO governance engaging community.
-• Mobile-first generation ente...</div>
+• Ethereum showed LST potential. MEV extraction profitable. Staking = passive income for holders.
+• Mobile-first generation entering crypto. Wallet UX dramatically improved. Native dApp stores bypass Apple/Google restrictions.
+
+**On-Chain Validation:** 100 recent transactions</span>
+                        <button class="why-toggle" onclick="toggleWhy(this)"><span>Read more</span><span class="why-toggle-icon">▼</span></button>
+                    </div>
                 </div>
 
                 <div class="evidence-section">
                     <div class="evidence-title">Key Evidence:</div>
                     <div class="evidence-pills">
+                        <span class="evidence-pill">Orca Whirlpools showing high activity wi...</span>
+                        <span class="evidence-pill">Growth: 40%</span>
+                        <span class="evidence-pill">Raydium showing high activity with 100 t...</span>
                         <span class="evidence-pill">40% mobile DEX trades</span>
-                        <span class="evidence-pill">Market signal: $100B</span>
-                        <span class="evidence-pill">MEV rewards</span>
-                        <span class="evidence-pill">Marginfi showing high activity with 100 ...</span>
                     </div>
                 </div>
 
@@ -655,14 +699,14 @@
                     </div>
                     <div class="metric">
                         <span>Signals:</span>
-                        <span class="metric-value">15</span>
+                        <span class="metric-value">16</span>
                     </div>
                     <span class="momentum-badge momentum-rising">📈 Rising</span>
                 </div>
                 
                 <div class="strength-bar-container">
                     <div class="strength-bar">
-                        <div class="strength-fill" style="width: 81.69800000000001%"></div>
+                        <div class="strength-fill" style="width: 81.922%"></div>
                     </div>
                     <div class="strength-labels">
                         <span>Signal Strength</span>
@@ -672,19 +716,25 @@
                 
                 <div class="why-section">
                     <div class="why-title">🎯 Why This Narrative is Emerging</div>
-                    <div class="why-text">Bonding curve innovation removed rug risk. Low friction = high velocity trading. Cultural moment for meme trading. Solana speed enables better trading UX.
+                    <div class="why-text">
+                        <span class="why-text-content collapsed">Bonding curve innovation removed rug risk. Low friction = high velocity trading. Cultural moment for meme trading. Solana speed enables better trading UX.
 
 **Key Drivers:**
-• Cultural narrative stronger than fundamentals. Low barrier to participation. Community-driven price discovery. Entertainment ...</div>
+• Cultural narrative stronger than fundamentals. Low barrier to participation. Community-driven price discovery. Entertainment value.
+• Bonding curve innovation removed rug risk. Low friction = high velocity. Cultural moment for meme trading. Solana speed = better trading UX.
+
+**On-Chain Validation:** 100 recent transactions</span>
+                        <button class="why-toggle" onclick="toggleWhy(this)"><span>Read more</span><span class="why-toggle-icon">▼</span></button>
+                    </div>
                 </div>
 
                 <div class="evidence-section">
                     <div class="evidence-title">Key Evidence:</div>
                     <div class="evidence-pills">
-                        <span class="evidence-pill">$180M daily volume</span>
-                        <span class="evidence-pill">PUMP +34%</span>
-                        <span class="evidence-pill">Scale: 300K daily</span>
-                        <span class="evidence-pill">Growth: 34%</span>
+                        <span class="evidence-pill">Market signal: $180M</span>
+                        <span class="evidence-pill">Sustained momentum</span>
+                        <span class="evidence-pill">39K tokens/day</span>
+                        <span class="evidence-pill">Pump.fun showing high activity with 100 ...</span>
                     </div>
                 </div>
 
@@ -753,19 +803,26 @@
                 
                 <div class="why-section">
                     <div class="why-title">🎯 Why This Narrative is Emerging</div>
-                    <div class="why-text">Previous cycle exposed congestion issues. Institutional adoption requires enterprise-grade performance. Firedancer and Alpenglow address core scaling challenges.
+                    <div class="why-text">
+                        <span class="why-text-content collapsed">Previous cycle exposed congestion issues. Institutional adoption requires enterprise-grade performance. Firedancer and Alpenglow address core scaling challenges.
 
 **Key Drivers:**
-• Previous cycle exposed congestion issues. Institutional adoption requires enterprise-grade performance. Competition fr...</div>
+• State rent was blocking mass adoption experiments. Compressed NFTs proved concept. Now generalizing to all account types.
+• TradFi integration requires finality guarantees. 12-second finality was blocking institutional adoption. Alpenglow unlocks new use cases (HFT, options, payments).
+• Previous cycle exposed congestion issues. Institutional adoption requires enterprise-grade performance. Competition from L2s and new L1s driving urgency.
+
+**On-Chain Validation:** 3,224 TPS network activity</span>
+                        <button class="why-toggle" onclick="toggleWhy(this)"><span>Read more</span><span class="why-toggle-icon">▼</span></button>
+                    </div>
                 </div>
 
                 <div class="evidence-section">
                     <div class="evidence-title">Key Evidence:</div>
                     <div class="evidence-pills">
-                        <span class="evidence-pill">1000x compression</span>
-                        <span class="evidence-pill">Light Protocol</span>
                         <span class="evidence-pill">Mainnet testing active</span>
-                        <span class="evidence-pill">Real-time network performance: 3,126 tra...</span>
+                        <span class="evidence-pill">Real-time network performance: 3,224 tra...</span>
+                        <span class="evidence-pill">80x improvement</span>
+                        <span class="evidence-pill">Reduced validator costs</span>
                     </div>
                 </div>
 
@@ -795,7 +852,7 @@
 
                 <div class="signals-section">
                     <div class="signals-title">📡 Recent Signals:</div>
-                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> Solana Network: 3,126 TPS, 787 Validators</a>
+                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> Solana Network: 3,224 TPS, 787 Validators</a>
                     <a href="https://github.com/anza-xyz/solana-sdk" class="signal" target="_blank"><span class="signal-icon">🐙</span> anza-xyz/solana-sdk</a>
                     <a href="https://github.com/alsk1992/CloddsBot" class="signal" target="_blank"><span class="signal-icon">🐙</span> alsk1992/CloddsBot</a>
                 </div>
@@ -834,19 +891,26 @@
                 
                 <div class="why-section">
                     <div class="why-title">🎯 Why This Narrative is Emerging</div>
-                    <div class="why-text">Solana's low fees make micropayments economically viable. Legacy payment giants (Visa, Western Union) validating blockchain rails. Regulatory clarity emerging.
+                    <div class="why-text">
+                        <span class="why-text-content collapsed">Solana's low fees make micropayments economically viable. Legacy payment giants (Visa, Western Union) validating blockchain rails. Regulatory clarity emerging.
 
 **Key Drivers:**
-• Regulatory clarity emerging. Solana's speed matches remittance UX expectations. Legacy players forced to compete with cr...</div>
+• Regulatory clarity emerging. Solana's speed matches remittance UX expectations. Legacy players forced to compete with crypto-native rails.
+• Card networks see blockchain as cost reduction. Solana's proven uptime and speed meet enterprise SLAs. First-mover advantage in B2B payments.
+• Circle prioritizing Solana for USDC expansion. Low fees make micropayments viable. AI agents driving automated payment flows.
+
+**On-Chain Validation:** $13.15B stablecoin supply</span>
+                        <button class="why-toggle" onclick="toggleWhy(this)"><span>Read more</span><span class="why-toggle-icon">▼</span></button>
+                    </div>
                 </div>
 
                 <div class="evidence-section">
                     <div class="evidence-title">Key Evidence:</div>
                     <div class="evidence-pills">
-                        <span class="evidence-pill">Market signal: $13.15B</span>
-                        <span class="evidence-pill">USDPT</span>
-                        <span class="evidence-pill">Visa settlement live</span>
-                        <span class="evidence-pill">Market signal: $700B</span>
+                        <span class="evidence-pill">Market signal: $1B</span>
+                        <span class="evidence-pill">Mastercard pilot</span>
+                        <span class="evidence-pill">Market signal: $9.59B</span>
+                        <span class="evidence-pill">$700B market</span>
                     </div>
                 </div>
 
@@ -898,14 +962,14 @@
                     </div>
                     <div class="metric">
                         <span>Signals:</span>
-                        <span class="metric-value">13</span>
+                        <span class="metric-value">12</span>
                     </div>
                     <span class="momentum-badge momentum-rising">📈 Rising</span>
                 </div>
                 
                 <div class="strength-bar-container">
                     <div class="strength-bar">
-                        <div class="strength-fill" style="width: 71.51599999999999%"></div>
+                        <div class="strength-fill" style="width: 71.702%"></div>
                     </div>
                     <div class="strength-labels">
                         <span>Signal Strength</span>
@@ -915,19 +979,24 @@
                 
                 <div class="why-section">
                     <div class="why-title">🎯 Why This Narrative is Emerging</div>
-                    <div class="why-text">LLM capabilities reached threshold for autonomous decision-making. Solana's sub-second finality enables real-time agent execution. ai16z proved the model works at scale.
+                    <div class="why-text">
+                        <span class="why-text-content collapsed">LLM capabilities reached threshold for autonomous decision-making. Solana's sub-second finality enables real-time agent execution. ai16z proved the model works at scale.
 
 **Key Drivers:**
-• LLMs reached capability threshold for autonomous decision-making. Solana's sub-second finality enables real-ti...</div>
+• Foundation model capabilities now sufficient for financial autonomy. Solana's low fees make AI micropayments economically viable.
+• Developer tooling matured. Pre-built actions lower barrier to entry from months to days. Ecosystem standardizing around interoperable agent protocols.
+• LLMs reached capability threshold for autonomous decision-making. Solana's sub-second finality enables real-time agent execution. ai16z proved the model works with $100M+ AUM.</span>
+                        <button class="why-toggle" onclick="toggleWhy(this)"><span>Read more</span><span class="why-toggle-icon">▼</span></button>
+                    </div>
                 </div>
 
                 <div class="evidence-section">
                     <div class="evidence-title">Key Evidence:</div>
                     <div class="evidence-pills">
-                        <span class="evidence-pill">60+ pre-built actions</span>
                         <span class="evidence-pill">Autonomous wallet control</span>
-                        <span class="evidence-pill">ai16z market cap $2B+</span>
+                        <span class="evidence-pill">60+ pre-built actions</span>
                         <span class="evidence-pill">4 competing frameworks</span>
+                        <span class="evidence-pill">ai16z market cap $2B+</span>
                     </div>
                 </div>
 
@@ -958,8 +1027,8 @@
                 <div class="signals-section">
                     <div class="signals-title">📡 Recent Signals:</div>
                     <a href="https://github.com/hanshaze/solana-sniper-copy-trading-bot" class="signal" target="_blank"><span class="signal-icon">🐙</span> hanshaze/solana-sniper-copy-trading-bot</a>
+                    <a href="https://github.com/EremosCore/Eremos" class="signal" target="_blank"><span class="signal-icon">🐙</span> EremosCore/Eremos</a>
                     <a href="https://github.com/alsk1992/CloddsBot" class="signal" target="_blank"><span class="signal-icon">🐙</span> alsk1992/CloddsBot</a>
-                    <a href="https://github.com/cascade-protocol/sati" class="signal" target="_blank"><span class="signal-icon">🐙</span> cascade-protocol/sati</a>
                 </div>
             </div>
 
@@ -979,14 +1048,14 @@
                     </div>
                     <div class="metric">
                         <span>Signals:</span>
-                        <span class="metric-value">10</span>
+                        <span class="metric-value">12</span>
                     </div>
                     <span class="momentum-badge momentum-rising">📈 Rising</span>
                 </div>
                 
                 <div class="strength-bar-container">
                     <div class="strength-bar">
-                        <div class="strength-fill" style="width: 71.086%"></div>
+                        <div class="strength-fill" style="width: 71.136%"></div>
                     </div>
                     <div class="strength-labels">
                         <span>Signal Strength</span>
@@ -996,19 +1065,24 @@
                 
                 <div class="why-section">
                     <div class="why-title">🎯 Why This Narrative is Emerging</div>
-                    <div class="why-text">Saga success proved demand for crypto phones. Hardware wallets solve UX. Token airdrops subsidize consumer adoption. Mobile-first generation entering crypto.
+                    <div class="why-text">
+                        <span class="why-text-content collapsed">Saga success proved demand for crypto phones. Hardware wallets solve UX. Token airdrops subsidize consumer adoption. Mobile-first generation entering crypto.
 
 **Key Drivers:**
-• Hardware costs dropped. Token incentives align contributors. Solana's speed enables real-time IoT coordination. Helium pro...</div>
+• Saga success proved demand. Hardware wallets solve UX. Token airdrops subsidize consumer adoption. Web3 phone becomes trojan horse.
+• Foundation model capabilities now sufficient for financial autonomy. Solana's low fees make AI micropayments economically viable.
+• Hardware costs dropped. Token incentives align contributors. Solana's speed enables real-time IoT coordination. Helium proved model works.</span>
+                        <button class="why-toggle" onclick="toggleWhy(this)"><span>Read more</span><span class="why-toggle-icon">▼</span></button>
+                    </div>
                 </div>
 
                 <div class="evidence-section">
                     <div class="evidence-title">Key Evidence:</div>
                     <div class="evidence-pills">
-                        <span class="evidence-pill">40% mobile DEX trades</span>
-                        <span class="evidence-pill">1.8B token airdrop</span>
-                        <span class="evidence-pill">Bandwidth sharing</span>
+                        <span class="evidence-pill">Growth: 40%</span>
                         <span class="evidence-pill">Autonomous wallet control</span>
+                        <span class="evidence-pill">Hardware-gated airdrops</span>
+                        <span class="evidence-pill">Real-world infrastructure</span>
                     </div>
                 </div>
 
@@ -1077,19 +1151,22 @@
                 
                 <div class="why-section">
                     <div class="why-title">🎯 Why This Narrative is Emerging</div>
-                    <div class="why-text">State rent was blocking mass adoption experiments. Compressed NFTs proved concept. 1000x cost reduction unlocks new use cases. Now generalizing to all account types.
+                    <div class="why-text">
+                        <span class="why-text-content collapsed">State rent was blocking mass adoption experiments. Compressed NFTs proved concept. 1000x cost reduction unlocks new use cases. Now generalizing to all account types.
 
 **Key Drivers:**
-• State rent was blocking mass adoption experiments. Compressed NFTs proved concept. Now generalizing to all account...</div>
+• State rent was blocking mass adoption experiments. Compressed NFTs proved concept. Now generalizing to all account types.</span>
+                        <button class="why-toggle" onclick="toggleWhy(this)"><span>Read more</span><span class="why-toggle-icon">▼</span></button>
+                    </div>
                 </div>
 
                 <div class="evidence-section">
                     <div class="evidence-title">Key Evidence:</div>
                     <div class="evidence-pills">
-                        <span class="evidence-pill">1000x compression</span>
-                        <span class="evidence-pill">Light Protocol</span>
                         <span class="evidence-pill">Reduced validator costs</span>
+                        <span class="evidence-pill">1000x compression</span>
                         <span class="evidence-pill">Magic Eden leading with 50 recent trades...</span>
+                        <span class="evidence-pill">Light Protocol</span>
                     </div>
                 </div>
 
@@ -1158,8 +1235,25 @@
         <footer>
             <p>Generated by <strong>Solana Narrative Radar v2.0</strong></p>
             <p>Data sources: <a href="https://helius.xyz" target="_blank">Helius API</a> (on-chain), GitHub API, Ecosystem Research</p>
-            <p>Report generated: 2026-02-11 09:43 UTC</p>
+            <p>Report generated: 2026-02-11 09:48 UTC</p>
         </footer>
     </div>
+    
+    <script>
+        function toggleWhy(btn) {
+            const content = btn.previousElementSibling;
+            const isCollapsed = content.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                content.classList.remove('collapsed');
+                btn.classList.add('expanded');
+                btn.querySelector('span:first-child').textContent = 'Show less';
+            } else {
+                content.classList.add('collapsed');
+                btn.classList.remove('expanded');
+                btn.querySelector('span:first-child').textContent = 'Read more';
+            }
+        }
+    </script>
 </body>
 </html>

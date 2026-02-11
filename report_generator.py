@@ -430,7 +430,45 @@ class ReportGenerator:
         .why-text {{
             font-size: 0.9rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
+            white-space: pre-line;
+        }}
+        
+        .why-text-content {{
+            display: block;
+        }}
+        
+        .why-text-content.collapsed {{
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }}
+        
+        .why-toggle {{
+            background: none;
+            border: none;
+            color: var(--sol-purple);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 0 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }}
+        
+        .why-toggle:hover {{
+            color: var(--sol-green);
+        }}
+        
+        .why-toggle-icon {{
+            transition: transform 0.3s ease;
+        }}
+        
+        .why-toggle.expanded .why-toggle-icon {{
+            transform: rotate(180deg);
         }}
         
         /* Evidence Pills */
@@ -716,7 +754,10 @@ class ReportGenerator:
                 
                 <div class="why-section">
                     <div class="why-title">🎯 Why This Narrative is Emerging</div>
-                    <div class="why-text">{narrative.why_emerging[:300]}{'...' if len(narrative.why_emerging) > 300 else ''}</div>
+                    <div class="why-text">
+                        <span class="why-text-content{' collapsed' if len(narrative.why_emerging) > 200 else ''}">{narrative.why_emerging}</span>
+                        {f'<button class="why-toggle" onclick="toggleWhy(this)"><span>Read more</span><span class="why-toggle-icon">▼</span></button>' if len(narrative.why_emerging) > 200 else ''}
+                    </div>
                 </div>
 """
             
@@ -821,6 +862,23 @@ class ReportGenerator:
             <p>Report generated: {timestamp.strftime('%Y-%m-%d %H:%M UTC')}</p>
         </footer>
     </div>
+    
+    <script>
+        function toggleWhy(btn) {{
+            const content = btn.previousElementSibling;
+            const isCollapsed = content.classList.contains('collapsed');
+            
+            if (isCollapsed) {{
+                content.classList.remove('collapsed');
+                btn.classList.add('expanded');
+                btn.querySelector('span:first-child').textContent = 'Show less';
+            }} else {{
+                content.classList.add('collapsed');
+                btn.classList.remove('expanded');
+                btn.querySelector('span:first-child').textContent = 'Read more';
+            }}
+        }}
+    </script>
 </body>
 </html>
 """
