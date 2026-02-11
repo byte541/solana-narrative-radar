@@ -72,5 +72,6 @@ DATA_SOURCES = {
 }
 
 # Output settings
-OUTPUT_DIR = "/home/clawdbot/clawd/builds/solana-narrative-radar/output"
+import os
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
 REPORT_FILE = "narrative_report"

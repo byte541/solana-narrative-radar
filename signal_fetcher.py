@@ -3,6 +3,7 @@
 import json
 import urllib.request
 import urllib.error
+import urllib.parse
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
 import ssl
