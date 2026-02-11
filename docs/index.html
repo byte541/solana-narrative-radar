@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solana Narrative Radar</title>
+    <style>
+        :root {
+            --sol-purple: #9945FF;
+            --sol-green: #14F195;
+            --sol-blue: #00D1FF;
+            --bg-dark: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--sol-purple) 0%, var(--sol-blue) 100%);
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .meta-item {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        
+        .narratives-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .narrative-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #333;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        
+        .narrative-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--sol-purple);
+        }
+        
+        .narrative-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .narrative-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--sol-green);
+        }
+        
+        .strength-badge {
+            background: linear-gradient(135deg, var(--sol-purple), var(--sol-blue));
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .strength-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sol-green), var(--sol-blue));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .evidence-list {
+            margin: 16px 0;
+        }
+        
+        .evidence-item {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            border-left: 2px solid var(--sol-purple);
+            padding-left: 12px;
+            margin: 8px 0;
+        }
+        
+        .ideas-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+        
+        .idea {
+            background: rgba(153, 69, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+        
+        .idea-name {
+            font-weight: 600;
+            color: var(--sol-blue);
+            margin-bottom: 8px;
+        }
+        
+        .idea-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .idea-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .idea-tag {
+            background: rgba(20, 241, 149, 0.2);
+            color: var(--sol-green);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .signals-section {
+            margin-top: 16px;
+        }
+        
+        .signal {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 6px 0;
+            text-decoration: none;
+            border-bottom: 1px solid #222;
+        }
+        
+        .signal:hover {
+            color: var(--sol-green);
+        }
+        
+        .signal-source {
+            display: inline-block;
+            width: 20px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .action-plan {
+            background: linear-gradient(135deg, rgba(153,69,255,0.2), rgba(0,209,255,0.2));
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .action-plan h2 {
+            margin-bottom: 20px;
+        }
+        
+        .action-item {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            border-left: 3px solid var(--sol-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔮 Solana Narrative Radar</h1>
+            <p class="subtitle">Emerging trends and build opportunities in the Solana ecosystem</p>
+            <div class="meta">
+                <span class="meta-item">📅 2026-02-10 21:33 UTC</span>
+                <span class="meta-item">📊 27 signals analyzed</span>
+                <span class="meta-item">🔥 5 active narratives</span>
+            </div>
+        </header>
+        
+        <div class="narratives-grid">
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <span class="narrative-title">🏗️ Infrastructure Upgrades (Firedancer/Alpenglow)</span>
+                    <span class="strength-badge">90/100</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 90%"></div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">9 signals detected</p>
+                
+                <div class="evidence-list">
+                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
+                    <div class="evidence-item">cheaper launches</div>
+                    <div class="evidence-item">1M TPS target</div>
+                    <div class="evidence-item">Render</div>
+                </div>
+                
+                <div class="ideas-section">
+                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
+
+                    <div class="idea">
+                        <div class="idea-name">Firedancer Node Dashboard</div>
+                        <div class="idea-desc">Real-time monitoring dashboard for Firedancer validators showing TPS, latency, block production stats, and comparison with legacy validators. Alert sy...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                        </div>
+                    </div>
+
+                    <div class="idea">
+                        <div class="idea-name">ZK Compression Migration Tool</div>
+                        <div class="idea-desc">One-click tool to migrate existing NFT collections and token accounts to compressed state. Calculates savings, handles migration, verifies integrity....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">4-5 weeks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="signals-section">
+                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
+                    <a href="https://github.com/AV1080p/Solana-Sniper-Bot" class="signal" target="_blank"><span class="signal-source">🐙</span> AV1080p/Solana-Sniper-Bot</a>
+                    <a href="https://github.com/x89/Solana-Arbitrage-Bot" class="signal" target="_blank"><span class="signal-source">🐙</span> x89/Solana-Arbitrage-Bot</a>
+                    <a href="https://github.com/jito-foundation/jito-solana" class="signal" target="_blank"><span class="signal-source">🐙</span> jito-foundation/jito-solana</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <span class="narrative-title">🤖 AI Agents & Autonomous Trading</span>
+                    <span class="strength-badge">76/100</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 75.51%"></div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">5 signals detected</p>
+                
+                <div class="evidence-list">
+                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
+                    <div class="evidence-item">Security fix drives adoption</div>
+                    <div class="evidence-item">token operations</div>
+                    <div class="evidence-item">DeFi interactions</div>
+                </div>
+                
+                <div class="ideas-section">
+                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
+
+                    <div class="idea">
+                        <div class="idea-name">AI Portfolio Rebalancer</div>
+                        <div class="idea-desc">An AI agent that monitors DeFi positions across Jupiter, Kamino, and Marinade, automatically rebalancing based on yield optimization and risk paramete...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                        </div>
+                    </div>
+
+                    <div class="idea">
+                        <div class="idea-name">Social Signal Trading Bot</div>
+                        <div class="idea-desc">Agent that monitors KOL tweets (Mert, Toly, Akshay), analyzes sentiment, and executes trades on pump.fun tokens within seconds of mention. Risk manage...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Advanced</span>
+                            <span class="idea-tag">4-6 weeks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="signals-section">
+                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
+                    <a href="https://github.com/HyperBuildX/Polymarket-Trading-Bot-Rust" class="signal" target="_blank"><span class="signal-source">🐙</span> HyperBuildX/Polymarket-Trading-Bot-Rust</a>
+                    <a href="https://github.com/0xfnzero/sol-trade-sdk" class="signal" target="_blank"><span class="signal-source">🐙</span> 0xfnzero/sol-trade-sdk</a>
+                    <a href="https://markets.financialcontent.com/stocks/article/tokenring-2026-2-6-the-rise-of-agentic-capital" class="signal" target="_blank"><span class="signal-source">📰</span> ai16z Autonomous Trading Swarms Reshape Solana DeF...</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <span class="narrative-title">💵 Stablecoin Revolution & PayFi</span>
+                    <span class="strength-badge">73/100</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 72.8%"></div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">5 signals detected</p>
+                
+                <div class="evidence-list">
+                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
+                    <div class="evidence-item">Visa settlement</div>
+                    <div class="evidence-item">Market signal: $1B</div>
+                    <div class="evidence-item">Security fix drives adoption</div>
+                </div>
+                
+                <div class="ideas-section">
+                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
+
+                    <div class="idea">
+                        <div class="idea-name">AI Micropayment Orchestrator</div>
+                        <div class="idea-desc">SDK for AI agents to make and receive USDC micropayments. Handles batching, streaming payments, and cost optimization for agent-to-agent commerce....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                        </div>
+                    </div>
+
+                    <div class="idea">
+                        <div class="idea-name">Cross-Border Remittance Tracker</div>
+                        <div class="idea-desc">Consumer app showing real-time USDC/USDPT remittance status, exchange rates, and fees vs Western Union traditional. Integrates with Solana Pay....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Beginner</span>
+                            <span class="idea-tag">2-3 weeks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="signals-section">
+                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
+                    <a href="https://github.com/HyperBuildX/Polymarket-Trading-Bot-Rust" class="signal" target="_blank"><span class="signal-source">🐙</span> HyperBuildX/Polymarket-Trading-Bot-Rust</a>
+                    <a href="https://www.hokanews.com/2026/02/openclaw-ai-suddenly-explodes-after.html" class="signal" target="_blank"><span class="signal-source">📰</span> OpenClaw AI Gains Momentum Across Solana and Base</a>
+                    <a href="https://www.hokanews.com/2026/01/1-billion-usdc-minted-on-solana-in.html" class="signal" target="_blank"><span class="signal-source">📰</span> $1 Billion USDC Minted on Solana in 8 Hours</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <span class="narrative-title">🐸 Meme Coins & Launchpads</span>
+                    <span class="strength-badge">66/100</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 66.13%"></div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">4 signals detected</p>
+                
+                <div class="evidence-list">
+                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
+                    <div class="evidence-item">39K tokens/day</div>
+                    <div class="evidence-item">Growth metric: 34%</div>
+                    <div class="evidence-item">launchpad activity</div>
+                </div>
+                
+                <div class="ideas-section">
+                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
+
+                    <div class="idea">
+                        <div class="idea-name">Pump.fun Analytics Pro</div>
+                        <div class="idea-desc">Real-time analytics for pump.fun launches. Bonding curve analysis, whale detection, rug pull probability score, social sentiment....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                        </div>
+                    </div>
+
+                    <div class="idea">
+                        <div class="idea-name">Meme Token Sniper Bot</div>
+                        <div class="idea-desc">Bot that detects new pump.fun launches, analyzes creator wallet history, and auto-buys promising tokens within first block....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Advanced</span>
+                            <span class="idea-tag">4-6 weeks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="signals-section">
+                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
+                    <a href="https://github.com/Shyft-to/solana-defi" class="signal" target="_blank"><span class="signal-source">🐙</span> Shyft-to/solana-defi</a>
+                    <a href="https://github.com/0xfnzero/sol-trade-sdk" class="signal" target="_blank"><span class="signal-source">🐙</span> 0xfnzero/sol-trade-sdk</a>
+                    <a href="https://www.bitget.com/news/detail/12560605178213" class="signal" target="_blank"><span class="signal-source">📰</span> Pump.fun Hits 300K Daily Active Addresses</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <span class="narrative-title">💱 DeFi Protocol Evolution</span>
+                    <span class="strength-badge">66/100</span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: 65.68%"></div>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">4 signals detected</p>
+                
+                <div class="evidence-list">
+                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
+                </div>
+                
+                <div class="ideas-section">
+                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
+
+                    <div class="idea">
+                        <div class="idea-name">Intent-Based Trading Interface</div>
+                        <div class="idea-desc">Natural language trading: 'Swap $100 to SOL when price drops 5%'. AI interprets intent, executes via Jupiter....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                        </div>
+                    </div>
+
+                    <div class="idea">
+                        <div class="idea-name">Liquid Staking Comparator</div>
+                        <div class="idea-desc">Tool comparing mSOL, jitoSOL, bSOL yields, lock periods, and risks. One-click migration between LSTs....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Beginner</span>
+                            <span class="idea-tag">2-3 weeks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="signals-section">
+                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
+                    <a href="https://github.com/jito-foundation/jito-solana" class="signal" target="_blank"><span class="signal-source">🐙</span> jito-foundation/jito-solana</a>
+                    <a href="https://github.com/Shyft-to/solana-defi" class="signal" target="_blank"><span class="signal-source">🐙</span> Shyft-to/solana-defi</a>
+                    <a href="https://github.com/cutupdev/Solana-Arbitrage-Bot" class="signal" target="_blank"><span class="signal-source">🐙</span> cutupdev/Solana-Arbitrage-Bot</a>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="action-plan">
+            <h2>🚀 Recommended Action Plan</h2>
+
+            <div class="action-item">
+                <strong>1. Highest Priority:</strong> Focus on Infrastructure Upgrades (Firedancer/Alpenglow)<br>
+                <span style="color: var(--text-secondary);">Strongest signal with clearest opportunity</span>
+<br><span style="color: var(--sol-green);">→ Start with: Firedancer Node Dashboard</span></div>
+
+            <div class="action-item">
+                <strong>2. Secondary Focus:</strong> AI Agents & Autonomous Trading<br>
+                <span style="color: var(--text-secondary);">Strong momentum, good market timing</span>
+            </div>
+
+            <div class="action-item">
+                <strong>3. Monitor:</strong> Keep watching infrastructure upgrades (Firedancer/Alpenglow) for timing
+            </div>
+            <div class="action-item">
+                <strong>4. Avoid:</strong> Oversaturated meme coin tools without differentiation
+            </div>
+        </div>
+        
+        <footer>
+            <p>Report generated by Solana Narrative Radar</p>
+            <p>Data sources: GitHub API, Brave Search, Ecosystem Research</p>
+        </footer>
+    </div>
+</body>
+</html>
