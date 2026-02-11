@@ -1,4 +1,4 @@
-"""Report Generator - Creates HTML and Markdown reports"""
+"""Report Generator - Creates stunning HTML dashboard and comprehensive reports"""
 
 import os
 import json
@@ -9,46 +9,58 @@ from narrative_detector import Narrative
 
 
 class ReportGenerator:
-    """Generates beautiful reports in HTML and Markdown formats"""
+    """Generates beautiful, data-rich reports in HTML and Markdown formats"""
     
     def __init__(self, output_dir: str = "output"):
         self.output_dir = output_dir
         os.makedirs(output_dir, exist_ok=True)
     
     def generate_markdown(self, narratives: List[Narrative], timestamp: datetime = None) -> str:
-        """Generate a markdown report"""
+        """Generate a comprehensive markdown report"""
         timestamp = timestamp or datetime.now()
         
         md = []
         md.append("# 🔮 Solana Narrative Radar Report")
         md.append(f"\n**Generated:** {timestamp.strftime('%Y-%m-%d %H:%M UTC')}")
-        md.append(f"\n**Period:** Past 14 days")
+        md.append(f"\n**Analysis Period:** Past 14 days")
         md.append(f"\n**Total Signals Analyzed:** {sum(len(n.signals) for n in narratives)}")
+        md.append(f"\n**Data Sources:** GitHub API, Helius On-Chain Data, Ecosystem Research")
         md.append("\n---\n")
         
         # Executive Summary
         md.append("## 📊 Executive Summary\n")
-        md.append("The following narratives are emerging in the Solana ecosystem based on signals from GitHub, KOL activity, and market research:\n")
+        md.append("The following narratives are emerging in the Solana ecosystem, ranked by signal strength, source diversity, and on-chain validation:\n")
         
         for i, narrative in enumerate(narratives, 1):
             strength_bar = "█" * int(narrative.strength_score / 10) + "░" * (10 - int(narrative.strength_score / 10))
-            md.append(f"{i}. **{narrative.name}** [{strength_bar}] {narrative.strength_score:.0f}/100")
+            momentum_icon = "📈" if narrative.momentum == "rising" else "➡️" if narrative.momentum == "stable" else "📉"
+            md.append(f"{i}. **{narrative.name}** [{strength_bar}] {narrative.strength_score:.0f}/100 {momentum_icon}")
+            md.append(f"   - Confidence: {narrative.confidence:.0f}% | Signals: {len(narrative.signals)}")
         
         md.append("\n---\n")
         
         # Detailed Narratives
         for narrative in narratives:
             md.append(f"## {self._get_emoji(narrative.category)} {narrative.name}")
-            md.append(f"\n**Strength Score:** {narrative.strength_score:.0f}/100 | **Signals:** {len(narrative.signals)}\n")
+            md.append(f"\n**Strength Score:** {narrative.strength_score:.0f}/100 | **Confidence:** {narrative.confidence:.0f}% | **Momentum:** {narrative.momentum.title()} | **Signals:** {len(narrative.signals)}\n")
             
-            # Summary
-            md.append(self._generate_narrative_summary(narrative))
+            # Why This Narrative is Emerging
+            md.append("### 🎯 Why This Narrative is Emerging")
+            md.append(f"\n{narrative.why_emerging}\n")
             
             # Evidence
             if narrative.evidence:
                 md.append("\n### 🔍 Key Evidence")
-                for ev in narrative.evidence[:5]:
+                for ev in narrative.evidence[:6]:
                     md.append(f"- {ev}")
+            
+            # On-Chain Metrics
+            if narrative.key_metrics:
+                md.append("\n### 📡 On-Chain Metrics (via Helius)")
+                for key, value in narrative.key_metrics.items():
+                    if isinstance(value, (int, float)) and value > 0:
+                        formatted = f"{value:,.0f}" if isinstance(value, int) else f"{value:,.2f}"
+                        md.append(f"- **{key.replace('_', ' ').title()}:** {formatted}")
             
             # Build Ideas
             if narrative.build_ideas:
@@ -65,54 +77,65 @@ class ReportGenerator:
             # Top Signals
             md.append("\n### 📡 Top Signals")
             for signal in narrative.signals[:5]:
-                source_icon = "🐙" if signal.source == "github" else "📰"
+                source_icon = {"github": "🐙", "helius_onchain": "⛓️", "research": "📰"}.get(signal.source, "📊")
                 md.append(f"- {source_icon} [{signal.title}]({signal.url})")
             
             md.append("\n---\n")
         
         # Action Plan
         md.append("## 🚀 Recommended Action Plan\n")
-        md.append("Based on narrative strength and build opportunity analysis:\n")
+        md.append("Based on narrative strength, confidence levels, and on-chain validation:\n")
         
         if narratives:
             top = narratives[0]
-            md.append(f"1. **Highest Priority:** Focus on {top.name} - strongest signal with clearest opportunity")
+            md.append(f"1. **Highest Priority:** {top.name}")
+            md.append(f"   - Strength {top.strength_score:.0f}/100 with {top.confidence:.0f}% confidence")
             if top.build_ideas:
-                md.append(f"   - Start with: {top.build_ideas[0]['name']}")
+                md.append(f"   - Start with: **{top.build_ideas[0]['name']}**")
         
         if len(narratives) > 1:
             second = narratives[1]
-            md.append(f"2. **Secondary Focus:** {second.name} - strong momentum, good market timing")
+            md.append(f"\n2. **Secondary Focus:** {second.name}")
+            md.append(f"   - {second.momentum.title()} momentum, good market timing")
         
-        md.append("\n3. **Monitor:** Keep watching infrastructure upgrades (Firedancer/Alpenglow) for timing")
-        md.append("4. **Avoid:** Oversaturated meme coin tools without differentiation")
+        if len(narratives) > 2:
+            third = narratives[2]
+            md.append(f"\n3. **Emerging Opportunity:** {third.name}")
         
-        # Footer
         md.append("\n---\n")
-        md.append("*Report generated by Solana Narrative Radar*")
-        md.append(f"\n*Data sources: GitHub API, Brave Search, Ecosystem Research*")
+        md.append("*Report generated by Solana Narrative Radar v2.0*")
+        md.append(f"\n*Data sources: GitHub API (authenticated), Helius On-Chain API, Curated Research*")
         
         return "\n".join(md)
     
     def generate_html(self, narratives: List[Narrative], timestamp: datetime = None) -> str:
-        """Generate an HTML dashboard report"""
+        """Generate a stunning HTML dashboard report"""
         timestamp = timestamp or datetime.now()
+        total_signals = sum(len(n.signals) for n in narratives)
+        
+        # Get on-chain data summary for header
+        onchain_stats = self._get_onchain_summary(narratives)
         
         html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Narrative Radar</title>
+    <title>Solana Narrative Radar | Live Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {{
             --sol-purple: #9945FF;
             --sol-green: #14F195;
             --sol-blue: #00D1FF;
-            --bg-dark: #0a0a0a;
-            --bg-card: #1a1a1a;
+            --sol-pink: #FF6B6B;
+            --sol-orange: #FFA726;
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
             --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
+            --text-secondary: #8888a0;
+            --border-color: #2a2a3a;
         }}
         
         * {{
@@ -126,306 +149,676 @@ class ReportGenerator:
             background: var(--bg-dark);
             color: var(--text-primary);
             line-height: 1.6;
-            padding: 20px;
+            min-height: 100vh;
         }}
         
         .container {{
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
         }}
         
-        header {{
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, var(--sol-purple) 0%, var(--sol-blue) 100%);
-            border-radius: 16px;
+        /* Hero Header */
+        .hero {{
+            background: linear-gradient(135deg, rgba(153, 69, 255, 0.15) 0%, rgba(0, 209, 255, 0.15) 50%, rgba(20, 241, 149, 0.1) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
             margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
         }}
         
-        h1 {{
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .hero::before {{
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(153, 69, 255, 0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
         }}
         
-        .subtitle {{
+        @keyframes pulse {{
+            0%, 100% {{ transform: scale(1); opacity: 0.5; }}
+            50% {{ transform: scale(1.1); opacity: 0.8; }}
+        }}
+        
+        .hero-content {{
+            position: relative;
+            z-index: 1;
+        }}
+        
+        .hero h1 {{
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--sol-green) 0%, var(--sol-blue) 50%, var(--sol-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }}
+        
+        .hero .tagline {{
             font-size: 1.1rem;
-            opacity: 0.9;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
         }}
         
-        .meta {{
-            display: flex;
-            justify-content: center;
-            gap: 30px;
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
             margin-top: 20px;
-            font-size: 0.9rem;
         }}
         
-        .meta-item {{
-            background: rgba(255,255,255,0.1);
-            padding: 8px 16px;
+        .stat-card {{
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+        }}
+        
+        .stat-value {{
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--sol-green);
+        }}
+        
+        .stat-label {{
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }}
+        
+        /* Live Badge */
+        .live-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(20, 241, 149, 0.15);
+            border: 1px solid var(--sol-green);
+            color: var(--sol-green);
+            padding: 6px 14px;
             border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }}
+        
+        .live-dot {{
+            width: 8px;
+            height: 8px;
+            background: var(--sol-green);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }}
+        
+        @keyframes blink {{
+            0%, 100% {{ opacity: 1; }}
+            50% {{ opacity: 0.3; }}
+        }}
+        
+        /* Narrative Cards */
+        .section-title {{
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 30px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }}
         
         .narratives-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
         }}
         
         .narrative-card {{
             background: var(--bg-card);
-            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             padding: 24px;
-            border: 1px solid #333;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }}
+        
+        .narrative-card::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--sol-purple), var(--sol-green));
+            opacity: 0;
+            transition: opacity 0.3s;
         }}
         
         .narrative-card:hover {{
             transform: translateY(-4px);
             border-color: var(--sol-purple);
+            box-shadow: 0 20px 40px rgba(153, 69, 255, 0.15);
+        }}
+        
+        .narrative-card:hover::before {{
+            opacity: 1;
         }}
         
         .narrative-header {{
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 16px;
         }}
         
+        .narrative-emoji {{
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }}
+        
         .narrative-title {{
-            font-size: 1.2rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }}
+        
+        .score-badge {{
+            background: linear-gradient(135deg, var(--sol-purple), var(--sol-blue));
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }}
+        
+        .metrics-row {{
+            display: flex;
+            gap: 16px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }}
+        
+        .metric {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }}
+        
+        .metric-value {{
+            color: var(--sol-green);
             font-weight: 600;
+        }}
+        
+        .momentum-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }}
+        
+        .momentum-rising {{
+            background: rgba(20, 241, 149, 0.15);
             color: var(--sol-green);
         }}
         
-        .strength-badge {{
-            background: linear-gradient(135deg, var(--sol-purple), var(--sol-blue));
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
+        .momentum-stable {{
+            background: rgba(0, 209, 255, 0.15);
+            color: var(--sol-blue);
+        }}
+        
+        .momentum-declining {{
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--sol-pink);
+        }}
+        
+        /* Strength Bar */
+        .strength-bar-container {{
+            margin: 16px 0;
         }}
         
         .strength-bar {{
             height: 8px;
-            background: #333;
+            background: rgba(255,255,255,0.1);
             border-radius: 4px;
             overflow: hidden;
-            margin: 12px 0;
         }}
         
         .strength-fill {{
             height: 100%;
-            background: linear-gradient(90deg, var(--sol-green), var(--sol-blue));
+            background: linear-gradient(90deg, var(--sol-green), var(--sol-blue), var(--sol-purple));
             border-radius: 4px;
-            transition: width 0.5s ease;
+            transition: width 1s ease-out;
         }}
         
-        .evidence-list {{
+        .strength-labels {{
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }}
+        
+        /* Why Section */
+        .why-section {{
+            background: rgba(153, 69, 255, 0.08);
+            border-left: 3px solid var(--sol-purple);
+            padding: 14px;
+            border-radius: 0 8px 8px 0;
             margin: 16px 0;
         }}
         
-        .evidence-item {{
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            padding: 4px 0;
-            border-left: 2px solid var(--sol-purple);
-            padding-left: 12px;
-            margin: 8px 0;
+        .why-title {{
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--sol-purple);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }}
         
+        .why-text {{
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }}
+        
+        /* Evidence Pills */
+        .evidence-section {{
+            margin: 16px 0;
+        }}
+        
+        .evidence-title {{
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }}
+        
+        .evidence-pills {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }}
+        
+        .evidence-pill {{
+            background: rgba(20, 241, 149, 0.1);
+            border: 1px solid rgba(20, 241, 149, 0.3);
+            color: var(--sol-green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }}
+        
+        /* Build Ideas */
         .ideas-section {{
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #333;
+            border-top: 1px solid var(--border-color);
         }}
         
-        .idea {{
-            background: rgba(153, 69, 255, 0.1);
-            border-radius: 8px;
-            padding: 16px;
-            margin: 12px 0;
+        .ideas-title {{
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--sol-blue);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        
+        .idea-card {{
+            background: rgba(0, 209, 255, 0.05);
+            border: 1px solid rgba(0, 209, 255, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            margin: 10px 0;
         }}
         
         .idea-name {{
             font-weight: 600;
-            color: var(--sol-blue);
-            margin-bottom: 8px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
         }}
         
         .idea-desc {{
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
+            margin-bottom: 10px;
         }}
         
         .idea-meta {{
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 12px;
         }}
         
         .idea-tag {{
-            background: rgba(20, 241, 149, 0.2);
-            color: var(--sol-green);
+            background: rgba(153, 69, 255, 0.15);
+            color: var(--sol-purple);
             padding: 4px 10px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 500;
         }}
         
+        /* Signals */
         .signals-section {{
             margin-top: 16px;
         }}
         
+        .signals-title {{
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }}
+        
         .signal {{
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            text-decoration: none;
             color: var(--text-secondary);
             font-size: 0.85rem;
-            padding: 6px 0;
-            text-decoration: none;
-            border-bottom: 1px solid #222;
+            transition: color 0.2s;
+        }}
+        
+        .signal:last-child {{
+            border-bottom: none;
         }}
         
         .signal:hover {{
             color: var(--sol-green);
         }}
         
-        .signal-source {{
-            display: inline-block;
-            width: 20px;
+        .signal-icon {{
+            font-size: 1rem;
+            flex-shrink: 0;
         }}
         
-        footer {{
-            text-align: center;
-            padding: 30px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }}
-        
+        /* Action Plan */
         .action-plan {{
-            background: linear-gradient(135deg, rgba(153,69,255,0.2), rgba(0,209,255,0.2));
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(20, 241, 149, 0.1), rgba(0, 209, 255, 0.1));
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             padding: 30px;
-            margin: 30px 0;
+            margin: 40px 0;
         }}
         
         .action-plan h2 {{
+            font-size: 1.4rem;
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }}
         
         .action-item {{
             background: var(--bg-card);
-            border-radius: 8px;
-            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
             margin: 12px 0;
-            border-left: 3px solid var(--sol-green);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }}
+        
+        .action-number {{
+            background: linear-gradient(135deg, var(--sol-purple), var(--sol-green));
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }}
+        
+        .action-content {{
+            flex: 1;
+        }}
+        
+        .action-title {{
+            font-weight: 600;
+            margin-bottom: 4px;
+        }}
+        
+        .action-desc {{
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }}
+        
+        /* Footer */
+        footer {{
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }}
+        
+        footer a {{
+            color: var(--sol-purple);
+            text-decoration: none;
+        }}
+        
+        /* Responsive */
+        @media (max-width: 768px) {{
+            .hero h1 {{
+                font-size: 2rem;
+            }}
+            
+            .narratives-grid {{
+                grid-template-columns: 1fr;
+            }}
+            
+            .stats-grid {{
+                grid-template-columns: repeat(2, 1fr);
+            }}
         }}
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🔮 Solana Narrative Radar</h1>
-            <p class="subtitle">Emerging trends and build opportunities in the Solana ecosystem</p>
-            <div class="meta">
-                <span class="meta-item">📅 {timestamp.strftime('%Y-%m-%d %H:%M UTC')}</span>
-                <span class="meta-item">📊 {sum(len(n.signals) for n in narratives)} signals analyzed</span>
-                <span class="meta-item">🔥 {len(narratives)} active narratives</span>
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="live-badge">
+                    <span class="live-dot"></span>
+                    <span>LIVE DATA</span>
+                </div>
+                <h1>🔮 Solana Narrative Radar</h1>
+                <p class="tagline">Real-time narrative detection with on-chain data validation via Helius API</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">{len(narratives)}</div>
+                        <div class="stat-label">Active Narratives</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{total_signals}</div>
+                        <div class="stat-label">Signals Analyzed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{onchain_stats.get('tps', 'N/A')}</div>
+                        <div class="stat-label">Network TPS</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{onchain_stats.get('stablecoins', 'N/A')}</div>
+                        <div class="stat-label">Stablecoin TVL</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{timestamp.strftime('%H:%M')}</div>
+                        <div class="stat-label">Last Updated (UTC)</div>
+                    </div>
+                </div>
             </div>
         </header>
         
+        <!-- Narratives Section -->
+        <h2 class="section-title">📊 Emerging Narratives</h2>
         <div class="narratives-grid">
 """
         
+        # Generate narrative cards
         for narrative in narratives:
             emoji = self._get_emoji(narrative.category)
+            momentum_class = f"momentum-{narrative.momentum}"
+            momentum_icon = "📈" if narrative.momentum == "rising" else "➡️" if narrative.momentum == "stable" else "📉"
+            
             html += f"""
             <div class="narrative-card">
                 <div class="narrative-header">
-                    <span class="narrative-title">{emoji} {narrative.name}</span>
-                    <span class="strength-badge">{narrative.strength_score:.0f}/100</span>
+                    <div>
+                        <div class="narrative-emoji">{emoji}</div>
+                        <div class="narrative-title">{narrative.name}</div>
+                    </div>
+                    <div class="score-badge">{narrative.strength_score:.0f}</div>
                 </div>
-                <div class="strength-bar">
-                    <div class="strength-fill" style="width: {narrative.strength_score}%"></div>
-                </div>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">{len(narrative.signals)} signals detected</p>
                 
-                <div class="evidence-list">
-                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span>Confidence:</span>
+                        <span class="metric-value">{narrative.confidence:.0f}%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Signals:</span>
+                        <span class="metric-value">{len(narrative.signals)}</span>
+                    </div>
+                    <span class="momentum-badge {momentum_class}">{momentum_icon} {narrative.momentum.title()}</span>
+                </div>
+                
+                <div class="strength-bar-container">
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: {narrative.strength_score}%"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span>Signal Strength</span>
+                        <span>{narrative.strength_score:.0f}/100</span>
+                    </div>
+                </div>
+                
+                <div class="why-section">
+                    <div class="why-title">🎯 Why This Narrative is Emerging</div>
+                    <div class="why-text">{narrative.why_emerging[:300]}{'...' if len(narrative.why_emerging) > 300 else ''}</div>
+                </div>
 """
-            for ev in narrative.evidence[:3]:
-                html += f'                    <div class="evidence-item">{ev}</div>\n'
             
-            html += """                </div>
-                
-                <div class="ideas-section">
-                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
+            # Evidence pills
+            if narrative.evidence:
+                html += """
+                <div class="evidence-section">
+                    <div class="evidence-title">Key Evidence:</div>
+                    <div class="evidence-pills">
 """
-            for idea in narrative.build_ideas[:2]:
-                html += f"""
-                    <div class="idea">
+                for ev in narrative.evidence[:4]:
+                    html += f'                        <span class="evidence-pill">{ev[:40]}{"..." if len(ev) > 40 else ""}</span>\n'
+                html += """                    </div>
+                </div>
+"""
+            
+            # Build ideas
+            if narrative.build_ideas:
+                html += """
+                <div class="ideas-section">
+                    <div class="ideas-title">💡 Top Build Ideas</div>
+"""
+                for idea in narrative.build_ideas[:2]:
+                    html += f"""
+                    <div class="idea-card">
                         <div class="idea-name">{idea['name']}</div>
-                        <div class="idea-desc">{idea['description'][:150]}...</div>
+                        <div class="idea-desc">{idea['description'][:120]}...</div>
                         <div class="idea-meta">
                             <span class="idea-tag">{idea['difficulty'].title()}</span>
                             <span class="idea-tag">{idea['time_to_build']}</span>
+                            <span class="idea-tag">{idea['potential_revenue'][:30]}</span>
                         </div>
                     </div>
 """
+                html += """                </div>
+"""
             
-            html += """                </div>
-                
+            # Top signals
+            html += """
                 <div class="signals-section">
-                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
+                    <div class="signals-title">📡 Recent Signals:</div>
 """
             for signal in narrative.signals[:3]:
-                icon = "🐙" if signal.source == "github" else "📰"
-                title = signal.title[:50] + "..." if len(signal.title) > 50 else signal.title
-                html += f'                    <a href="{signal.url}" class="signal" target="_blank"><span class="signal-source">{icon}</span> {title}</a>\n'
+                icon = {"github": "🐙", "helius_onchain": "⛓️", "research": "📰"}.get(signal.source, "📊")
+                title = signal.title[:45] + "..." if len(signal.title) > 45 else signal.title
+                html += f'                    <a href="{signal.url}" class="signal" target="_blank"><span class="signal-icon">{icon}</span> {title}</a>\n'
             
             html += """                </div>
             </div>
 """
         
+        # Action Plan
         html += """
         </div>
         
         <div class="action-plan">
             <h2>🚀 Recommended Action Plan</h2>
 """
+        
         if narratives:
             top = narratives[0]
             html += f"""
             <div class="action-item">
-                <strong>1. Highest Priority:</strong> Focus on {top.name}<br>
-                <span style="color: var(--text-secondary);">Strongest signal with clearest opportunity</span>
+                <div class="action-number">1</div>
+                <div class="action-content">
+                    <div class="action-title">Highest Priority: {top.name}</div>
+                    <div class="action-desc">Strength {top.strength_score:.0f}/100 with {top.confidence:.0f}% confidence. {f"Start with: {top.build_ideas[0]['name']}" if top.build_ideas else "Strong momentum in this space."}</div>
+                </div>
+            </div>
 """
-            if top.build_ideas:
-                html += f'<br><span style="color: var(--sol-green);">→ Start with: {top.build_ideas[0]["name"]}</span>'
-            html += "</div>\n"
             
             if len(narratives) > 1:
                 second = narratives[1]
                 html += f"""
             <div class="action-item">
-                <strong>2. Secondary Focus:</strong> {second.name}<br>
-                <span style="color: var(--text-secondary);">Strong momentum, good market timing</span>
+                <div class="action-number">2</div>
+                <div class="action-content">
+                    <div class="action-title">Secondary Focus: {second.name}</div>
+                    <div class="action-desc">{second.momentum.title()} momentum with solid on-chain validation. Good timing for builders.</div>
+                </div>
+            </div>
+"""
+            
+            if len(narratives) > 2:
+                third = narratives[2]
+                html += f"""
+            <div class="action-item">
+                <div class="action-number">3</div>
+                <div class="action-content">
+                    <div class="action-title">Watch: {third.name}</div>
+                    <div class="action-desc">Emerging opportunity with growing signal strength. Monitor for timing.</div>
+                </div>
             </div>
 """
         
-        html += """
-            <div class="action-item">
-                <strong>3. Monitor:</strong> Keep watching infrastructure upgrades (Firedancer/Alpenglow) for timing
-            </div>
-            <div class="action-item">
-                <strong>4. Avoid:</strong> Oversaturated meme coin tools without differentiation
-            </div>
+        html += f"""
         </div>
         
         <footer>
-            <p>Report generated by Solana Narrative Radar</p>
-            <p>Data sources: GitHub API, Brave Search, Ecosystem Research</p>
+            <p>Generated by <strong>Solana Narrative Radar v2.0</strong></p>
+            <p>Data sources: <a href="https://helius.xyz" target="_blank">Helius API</a> (on-chain), GitHub API, Ecosystem Research</p>
+            <p>Report generated: {timestamp.strftime('%Y-%m-%d %H:%M UTC')}</p>
         </footer>
     </div>
 </body>
@@ -448,23 +841,21 @@ class ReportGenerator:
         }
         return emojis.get(category, "📊")
     
-    def _generate_narrative_summary(self, narrative: Narrative) -> str:
-        """Generate a summary paragraph for a narrative"""
-        summaries = {
-            "ai_agents": "AI agents are transforming Solana DeFi with autonomous trading capabilities. ai16z's framework and Solana Agent Kit with 60+ pre-built actions are enabling a new wave of intelligent on-chain applications.",
-            "infrastructure": "Major infrastructure upgrades are positioning Solana as a 'Decentralized Nasdaq'. Firedancer targets 1M TPS while Alpenglow promises 150ms finality - both launching in 2026.",
-            "stablecoins_payfi": "Stablecoin activity is exploding with $4.25B USDC on Solana. Western Union's USDPT and Visa settlement signal institutional adoption of Solana for payments.",
-            "rwa_tokenization": "Real-world asset tokenization is gaining massive traction. Ondo's 200+ tokenized stocks and WisdomTree's expansion push RWA on Solana past $1B.",
-            "mobile_consumer": "Mobile Web3 is becoming reality with Solana Seeker. 150K+ preorders and hardware-gated airdrops signal a new distribution model for consumer apps.",
-            "depin": "DePIN (Decentralized Physical Infrastructure) continues to grow with projects like Dawn Network, Render, and Helium leveraging Solana's speed.",
-            "memecoins": "Meme coin activity remains strong with Pump.fun processing 39K token launches daily and $180M in launchpad volume.",
-            "defi_evolution": "DeFi protocols are evolving with new primitives around intents, liquid staking, and cross-protocol coordination.",
-            "zk_compression": "ZK Compression enables 1000x cost reduction for on-chain state, unlocking new possibilities for NFTs and tokens."
-        }
-        return summaries.get(narrative.category, f"This narrative is showing strong signals in the Solana ecosystem.")
+    def _get_onchain_summary(self, narratives: List[Narrative]) -> Dict[str, str]:
+        """Extract on-chain stats summary from narratives"""
+        stats = {"tps": "N/A", "stablecoins": "N/A"}
+        
+        for narrative in narratives:
+            metrics = narrative.key_metrics
+            if "tps" in metrics and metrics["tps"]:
+                stats["tps"] = f"{metrics['tps']:,}"
+            if "total_supply_usd" in metrics and metrics["total_supply_usd"]:
+                stats["stablecoins"] = f"${metrics['total_supply_usd']/1e9:.1f}B"
+        
+        return stats
     
     def save_reports(self, narratives: List[Narrative]) -> Dict[str, str]:
-        """Save both HTML and Markdown reports"""
+        """Save HTML, Markdown, and JSON reports"""
         timestamp = datetime.now()
         
         # Generate reports
@@ -485,7 +876,9 @@ class ReportGenerator:
         json_path = os.path.join(self.output_dir, "narrative_data.json")
         with open(json_path, "w") as f:
             json.dump({
+                "version": "2.0",
                 "timestamp": timestamp.isoformat(),
+                "total_signals": sum(len(n.signals) for n in narratives),
                 "narratives": [n.to_dict() for n in narratives]
             }, f, indent=2)
         

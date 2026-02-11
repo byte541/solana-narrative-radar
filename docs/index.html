@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Narrative Radar</title>
+    <title>Solana Narrative Radar | Live Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --sol-purple: #9945FF;
             --sol-green: #14F195;
             --sol-blue: #00D1FF;
-            --bg-dark: #0a0a0a;
-            --bg-card: #1a1a1a;
+            --sol-pink: #FF6B6B;
+            --sol-orange: #FFA726;
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
             --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
+            --text-secondary: #8888a0;
+            --border-color: #2a2a3a;
         }
         
         * {
@@ -26,446 +31,1096 @@
             background: var(--bg-dark);
             color: var(--text-primary);
             line-height: 1.6;
-            padding: 20px;
+            min-height: 100vh;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
         }
         
-        header {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, var(--sol-purple) 0%, var(--sol-blue) 100%);
-            border-radius: 16px;
+        /* Hero Header */
+        .hero {
+            background: linear-gradient(135deg, rgba(153, 69, 255, 0.15) 0%, rgba(0, 209, 255, 0.15) 50%, rgba(20, 241, 149, 0.1) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
             margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
         }
         
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(153, 69, 255, 0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
         }
         
-        .subtitle {
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--sol-green) 0%, var(--sol-blue) 50%, var(--sol-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+        
+        .hero .tagline {
             font-size: 1.1rem;
-            opacity: 0.9;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
         }
         
-        .meta {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
             margin-top: 20px;
-            font-size: 0.9rem;
         }
         
-        .meta-item {
-            background: rgba(255,255,255,0.1);
-            padding: 8px 16px;
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--sol-green);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        /* Live Badge */
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(20, 241, 149, 0.15);
+            border: 1px solid var(--sol-green);
+            color: var(--sol-green);
+            padding: 6px 14px;
             border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--sol-green);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Narrative Cards */
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 30px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .narratives-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
         }
         
         .narrative-card {
             background: var(--bg-card);
-            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             padding: 24px;
-            border: 1px solid #333;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .narrative-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--sol-purple), var(--sol-green));
+            opacity: 0;
+            transition: opacity 0.3s;
         }
         
         .narrative-card:hover {
             transform: translateY(-4px);
             border-color: var(--sol-purple);
+            box-shadow: 0 20px 40px rgba(153, 69, 255, 0.15);
+        }
+        
+        .narrative-card:hover::before {
+            opacity: 1;
         }
         
         .narrative-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 16px;
         }
         
+        .narrative-emoji {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
         .narrative-title {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        
+        .score-badge {
+            background: linear-gradient(135deg, var(--sol-purple), var(--sol-blue));
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+        
+        .metrics-row {
+            display: flex;
+            gap: 16px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .metric-value {
+            color: var(--sol-green);
             font-weight: 600;
+        }
+        
+        .momentum-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .momentum-rising {
+            background: rgba(20, 241, 149, 0.15);
             color: var(--sol-green);
         }
         
-        .strength-badge {
-            background: linear-gradient(135deg, var(--sol-purple), var(--sol-blue));
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
+        .momentum-stable {
+            background: rgba(0, 209, 255, 0.15);
+            color: var(--sol-blue);
+        }
+        
+        .momentum-declining {
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--sol-pink);
+        }
+        
+        /* Strength Bar */
+        .strength-bar-container {
+            margin: 16px 0;
         }
         
         .strength-bar {
             height: 8px;
-            background: #333;
+            background: rgba(255,255,255,0.1);
             border-radius: 4px;
             overflow: hidden;
-            margin: 12px 0;
         }
         
         .strength-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--sol-green), var(--sol-blue));
+            background: linear-gradient(90deg, var(--sol-green), var(--sol-blue), var(--sol-purple));
             border-radius: 4px;
-            transition: width 0.5s ease;
+            transition: width 1s ease-out;
         }
         
-        .evidence-list {
+        .strength-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+        
+        /* Why Section */
+        .why-section {
+            background: rgba(153, 69, 255, 0.08);
+            border-left: 3px solid var(--sol-purple);
+            padding: 14px;
+            border-radius: 0 8px 8px 0;
             margin: 16px 0;
         }
         
-        .evidence-item {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            padding: 4px 0;
-            border-left: 2px solid var(--sol-purple);
-            padding-left: 12px;
-            margin: 8px 0;
+        .why-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--sol-purple);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
+        .why-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        /* Evidence Pills */
+        .evidence-section {
+            margin: 16px 0;
+        }
+        
+        .evidence-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        
+        .evidence-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .evidence-pill {
+            background: rgba(20, 241, 149, 0.1);
+            border: 1px solid rgba(20, 241, 149, 0.3);
+            color: var(--sol-green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        /* Build Ideas */
         .ideas-section {
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #333;
+            border-top: 1px solid var(--border-color);
         }
         
-        .idea {
-            background: rgba(153, 69, 255, 0.1);
-            border-radius: 8px;
-            padding: 16px;
-            margin: 12px 0;
+        .ideas-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--sol-blue);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .idea-card {
+            background: rgba(0, 209, 255, 0.05);
+            border: 1px solid rgba(0, 209, 255, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            margin: 10px 0;
         }
         
         .idea-name {
             font-weight: 600;
-            color: var(--sol-blue);
-            margin-bottom: 8px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
         }
         
         .idea-desc {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
+            margin-bottom: 10px;
         }
         
         .idea-meta {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 12px;
         }
         
         .idea-tag {
-            background: rgba(20, 241, 149, 0.2);
-            color: var(--sol-green);
+            background: rgba(153, 69, 255, 0.15);
+            color: var(--sol-purple);
             padding: 4px 10px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
         
+        /* Signals */
         .signals-section {
             margin-top: 16px;
         }
         
+        .signals-title {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        
         .signal {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            text-decoration: none;
             color: var(--text-secondary);
             font-size: 0.85rem;
-            padding: 6px 0;
-            text-decoration: none;
-            border-bottom: 1px solid #222;
+            transition: color 0.2s;
+        }
+        
+        .signal:last-child {
+            border-bottom: none;
         }
         
         .signal:hover {
             color: var(--sol-green);
         }
         
-        .signal-source {
-            display: inline-block;
-            width: 20px;
+        .signal-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
         }
         
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        
+        /* Action Plan */
         .action-plan {
-            background: linear-gradient(135deg, rgba(153,69,255,0.2), rgba(0,209,255,0.2));
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(20, 241, 149, 0.1), rgba(0, 209, 255, 0.1));
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             padding: 30px;
-            margin: 30px 0;
+            margin: 40px 0;
         }
         
         .action-plan h2 {
+            font-size: 1.4rem;
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .action-item {
             background: var(--bg-card);
-            border-radius: 8px;
-            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
             margin: 12px 0;
-            border-left: 3px solid var(--sol-green);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        
+        .action-number {
+            background: linear-gradient(135deg, var(--sol-purple), var(--sol-green));
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .action-content {
+            flex: 1;
+        }
+        
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .action-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+        
+        footer a {
+            color: var(--sol-purple);
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .narratives-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🔮 Solana Narrative Radar</h1>
-            <p class="subtitle">Emerging trends and build opportunities in the Solana ecosystem</p>
-            <div class="meta">
-                <span class="meta-item">📅 2026-02-10 21:33 UTC</span>
-                <span class="meta-item">📊 27 signals analyzed</span>
-                <span class="meta-item">🔥 5 active narratives</span>
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="live-badge">
+                    <span class="live-dot"></span>
+                    <span>LIVE DATA</span>
+                </div>
+                <h1>🔮 Solana Narrative Radar</h1>
+                <p class="tagline">Real-time narrative detection with on-chain data validation via Helius API</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">7</div>
+                        <div class="stat-label">Active Narratives</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">66</div>
+                        <div class="stat-label">Signals Analyzed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">3,126</div>
+                        <div class="stat-label">Network TPS</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$13.2B</div>
+                        <div class="stat-label">Stablecoin TVL</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">09:43</div>
+                        <div class="stat-label">Last Updated (UTC)</div>
+                    </div>
+                </div>
             </div>
         </header>
         
+        <!-- Narratives Section -->
+        <h2 class="section-title">📊 Emerging Narratives</h2>
         <div class="narratives-grid">
 
             <div class="narrative-card">
                 <div class="narrative-header">
-                    <span class="narrative-title">🏗️ Infrastructure Upgrades (Firedancer/Alpenglow)</span>
-                    <span class="strength-badge">90/100</span>
-                </div>
-                <div class="strength-bar">
-                    <div class="strength-fill" style="width: 90%"></div>
-                </div>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">9 signals detected</p>
-                
-                <div class="evidence-list">
-                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
-                    <div class="evidence-item">cheaper launches</div>
-                    <div class="evidence-item">1M TPS target</div>
-                    <div class="evidence-item">Render</div>
+                    <div>
+                        <div class="narrative-emoji">💱</div>
+                        <div class="narrative-title">DeFi Protocol Evolution</div>
+                    </div>
+                    <div class="score-badge">89</div>
                 </div>
                 
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span>Confidence:</span>
+                        <span class="metric-value">90%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Signals:</span>
+                        <span class="metric-value">13</span>
+                    </div>
+                    <span class="momentum-badge momentum-rising">📈 Rising</span>
+                </div>
+                
+                <div class="strength-bar-container">
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: 88.76599999999999%"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span>Signal Strength</span>
+                        <span>89/100</span>
+                    </div>
+                </div>
+                
+                <div class="why-section">
+                    <div class="why-title">🎯 Why This Narrative is Emerging</div>
+                    <div class="why-text">Aggregation layer becoming essential infrastructure. Perp demand from CEX refugees. Liquid staking wars driving innovation and yield competition.
+
+**Key Drivers:**
+• Aggregation layer becoming essential. Perp demand from CEX refugees. DAO governance engaging community.
+• Mobile-first generation ente...</div>
+                </div>
+
+                <div class="evidence-section">
+                    <div class="evidence-title">Key Evidence:</div>
+                    <div class="evidence-pills">
+                        <span class="evidence-pill">40% mobile DEX trades</span>
+                        <span class="evidence-pill">Market signal: $100B</span>
+                        <span class="evidence-pill">MEV rewards</span>
+                        <span class="evidence-pill">Marginfi showing high activity with 100 ...</span>
+                    </div>
+                </div>
+
                 <div class="ideas-section">
-                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
+                    <div class="ideas-title">💡 Top Build Ideas</div>
 
-                    <div class="idea">
-                        <div class="idea-name">Firedancer Node Dashboard</div>
-                        <div class="idea-desc">Real-time monitoring dashboard for Firedancer validators showing TPS, latency, block production stats, and comparison with legacy validators. Alert sy...</div>
-                        <div class="idea-meta">
-                            <span class="idea-tag">Intermediate</span>
-                            <span class="idea-tag">3-4 weeks</span>
-                        </div>
-                    </div>
-
-                    <div class="idea">
-                        <div class="idea-name">ZK Compression Migration Tool</div>
-                        <div class="idea-desc">One-click tool to migrate existing NFT collections and token accounts to compressed state. Calculates savings, handles migration, verifies integrity....</div>
-                        <div class="idea-meta">
-                            <span class="idea-tag">Intermediate</span>
-                            <span class="idea-tag">4-5 weeks</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="signals-section">
-                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
-                    <a href="https://github.com/AV1080p/Solana-Sniper-Bot" class="signal" target="_blank"><span class="signal-source">🐙</span> AV1080p/Solana-Sniper-Bot</a>
-                    <a href="https://github.com/x89/Solana-Arbitrage-Bot" class="signal" target="_blank"><span class="signal-source">🐙</span> x89/Solana-Arbitrage-Bot</a>
-                    <a href="https://github.com/jito-foundation/jito-solana" class="signal" target="_blank"><span class="signal-source">🐙</span> jito-foundation/jito-solana</a>
-                </div>
-            </div>
-
-            <div class="narrative-card">
-                <div class="narrative-header">
-                    <span class="narrative-title">🤖 AI Agents & Autonomous Trading</span>
-                    <span class="strength-badge">76/100</span>
-                </div>
-                <div class="strength-bar">
-                    <div class="strength-fill" style="width: 75.51%"></div>
-                </div>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">5 signals detected</p>
-                
-                <div class="evidence-list">
-                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
-                    <div class="evidence-item">Security fix drives adoption</div>
-                    <div class="evidence-item">token operations</div>
-                    <div class="evidence-item">DeFi interactions</div>
-                </div>
-                
-                <div class="ideas-section">
-                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
-
-                    <div class="idea">
-                        <div class="idea-name">AI Portfolio Rebalancer</div>
-                        <div class="idea-desc">An AI agent that monitors DeFi positions across Jupiter, Kamino, and Marinade, automatically rebalancing based on yield optimization and risk paramete...</div>
-                        <div class="idea-meta">
-                            <span class="idea-tag">Intermediate</span>
-                            <span class="idea-tag">3-4 weeks</span>
-                        </div>
-                    </div>
-
-                    <div class="idea">
-                        <div class="idea-name">Social Signal Trading Bot</div>
-                        <div class="idea-desc">Agent that monitors KOL tweets (Mert, Toly, Akshay), analyzes sentiment, and executes trades on pump.fun tokens within seconds of mention. Risk manage...</div>
-                        <div class="idea-meta">
-                            <span class="idea-tag">Advanced</span>
-                            <span class="idea-tag">4-6 weeks</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="signals-section">
-                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
-                    <a href="https://github.com/HyperBuildX/Polymarket-Trading-Bot-Rust" class="signal" target="_blank"><span class="signal-source">🐙</span> HyperBuildX/Polymarket-Trading-Bot-Rust</a>
-                    <a href="https://github.com/0xfnzero/sol-trade-sdk" class="signal" target="_blank"><span class="signal-source">🐙</span> 0xfnzero/sol-trade-sdk</a>
-                    <a href="https://markets.financialcontent.com/stocks/article/tokenring-2026-2-6-the-rise-of-agentic-capital" class="signal" target="_blank"><span class="signal-source">📰</span> ai16z Autonomous Trading Swarms Reshape Solana DeF...</a>
-                </div>
-            </div>
-
-            <div class="narrative-card">
-                <div class="narrative-header">
-                    <span class="narrative-title">💵 Stablecoin Revolution & PayFi</span>
-                    <span class="strength-badge">73/100</span>
-                </div>
-                <div class="strength-bar">
-                    <div class="strength-fill" style="width: 72.8%"></div>
-                </div>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">5 signals detected</p>
-                
-                <div class="evidence-list">
-                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
-                    <div class="evidence-item">Visa settlement</div>
-                    <div class="evidence-item">Market signal: $1B</div>
-                    <div class="evidence-item">Security fix drives adoption</div>
-                </div>
-                
-                <div class="ideas-section">
-                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
-
-                    <div class="idea">
-                        <div class="idea-name">AI Micropayment Orchestrator</div>
-                        <div class="idea-desc">SDK for AI agents to make and receive USDC micropayments. Handles batching, streaming payments, and cost optimization for agent-to-agent commerce....</div>
-                        <div class="idea-meta">
-                            <span class="idea-tag">Intermediate</span>
-                            <span class="idea-tag">3-4 weeks</span>
-                        </div>
-                    </div>
-
-                    <div class="idea">
-                        <div class="idea-name">Cross-Border Remittance Tracker</div>
-                        <div class="idea-desc">Consumer app showing real-time USDC/USDPT remittance status, exchange rates, and fees vs Western Union traditional. Integrates with Solana Pay....</div>
-                        <div class="idea-meta">
-                            <span class="idea-tag">Beginner</span>
-                            <span class="idea-tag">2-3 weeks</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="signals-section">
-                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
-                    <a href="https://github.com/HyperBuildX/Polymarket-Trading-Bot-Rust" class="signal" target="_blank"><span class="signal-source">🐙</span> HyperBuildX/Polymarket-Trading-Bot-Rust</a>
-                    <a href="https://www.hokanews.com/2026/02/openclaw-ai-suddenly-explodes-after.html" class="signal" target="_blank"><span class="signal-source">📰</span> OpenClaw AI Gains Momentum Across Solana and Base</a>
-                    <a href="https://www.hokanews.com/2026/01/1-billion-usdc-minted-on-solana-in.html" class="signal" target="_blank"><span class="signal-source">📰</span> $1 Billion USDC Minted on Solana in 8 Hours</a>
-                </div>
-            </div>
-
-            <div class="narrative-card">
-                <div class="narrative-header">
-                    <span class="narrative-title">🐸 Meme Coins & Launchpads</span>
-                    <span class="strength-badge">66/100</span>
-                </div>
-                <div class="strength-bar">
-                    <div class="strength-fill" style="width: 66.13%"></div>
-                </div>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">4 signals detected</p>
-                
-                <div class="evidence-list">
-                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
-                    <div class="evidence-item">39K tokens/day</div>
-                    <div class="evidence-item">Growth metric: 34%</div>
-                    <div class="evidence-item">launchpad activity</div>
-                </div>
-                
-                <div class="ideas-section">
-                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
-
-                    <div class="idea">
-                        <div class="idea-name">Pump.fun Analytics Pro</div>
-                        <div class="idea-desc">Real-time analytics for pump.fun launches. Bonding curve analysis, whale detection, rug pull probability score, social sentiment....</div>
-                        <div class="idea-meta">
-                            <span class="idea-tag">Intermediate</span>
-                            <span class="idea-tag">3-4 weeks</span>
-                        </div>
-                    </div>
-
-                    <div class="idea">
-                        <div class="idea-name">Meme Token Sniper Bot</div>
-                        <div class="idea-desc">Bot that detects new pump.fun launches, analyzes creator wallet history, and auto-buys promising tokens within first block....</div>
-                        <div class="idea-meta">
-                            <span class="idea-tag">Advanced</span>
-                            <span class="idea-tag">4-6 weeks</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="signals-section">
-                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
-                    <a href="https://github.com/Shyft-to/solana-defi" class="signal" target="_blank"><span class="signal-source">🐙</span> Shyft-to/solana-defi</a>
-                    <a href="https://github.com/0xfnzero/sol-trade-sdk" class="signal" target="_blank"><span class="signal-source">🐙</span> 0xfnzero/sol-trade-sdk</a>
-                    <a href="https://www.bitget.com/news/detail/12560605178213" class="signal" target="_blank"><span class="signal-source">📰</span> Pump.fun Hits 300K Daily Active Addresses</a>
-                </div>
-            </div>
-
-            <div class="narrative-card">
-                <div class="narrative-header">
-                    <span class="narrative-title">💱 DeFi Protocol Evolution</span>
-                    <span class="strength-badge">66/100</span>
-                </div>
-                <div class="strength-bar">
-                    <div class="strength-fill" style="width: 65.68%"></div>
-                </div>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">4 signals detected</p>
-                
-                <div class="evidence-list">
-                    <strong style="font-size: 0.85rem; color: var(--sol-purple);">Key Evidence:</strong>
-                </div>
-                
-                <div class="ideas-section">
-                    <strong style="color: var(--sol-blue);">💡 Top Build Ideas:</strong>
-
-                    <div class="idea">
+                    <div class="idea-card">
                         <div class="idea-name">Intent-Based Trading Interface</div>
                         <div class="idea-desc">Natural language trading: 'Swap $100 to SOL when price drops 5%'. AI interprets intent, executes via Jupiter....</div>
                         <div class="idea-meta">
                             <span class="idea-tag">Intermediate</span>
                             <span class="idea-tag">3-4 weeks</span>
+                            <span class="idea-tag">Premium feature or affiliate</span>
                         </div>
                     </div>
 
-                    <div class="idea">
+                    <div class="idea-card">
                         <div class="idea-name">Liquid Staking Comparator</div>
                         <div class="idea-desc">Tool comparing mSOL, jitoSOL, bSOL yields, lock periods, and risks. One-click migration between LSTs....</div>
                         <div class="idea-meta">
                             <span class="idea-tag">Beginner</span>
                             <span class="idea-tag">2-3 weeks</span>
+                            <span class="idea-tag">Referral fees from protocols</span>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="signals-section">
-                    <strong style="font-size: 0.85rem;">📡 Recent Signals:</strong>
-                    <a href="https://github.com/jito-foundation/jito-solana" class="signal" target="_blank"><span class="signal-source">🐙</span> jito-foundation/jito-solana</a>
-                    <a href="https://github.com/Shyft-to/solana-defi" class="signal" target="_blank"><span class="signal-source">🐙</span> Shyft-to/solana-defi</a>
-                    <a href="https://github.com/cutupdev/Solana-Arbitrage-Bot" class="signal" target="_blank"><span class="signal-source">🐙</span> cutupdev/Solana-Arbitrage-Bot</a>
+                    <div class="signals-title">📡 Recent Signals:</div>
+                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> Jupiter: 100 recent transactions</a>
+                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> Raydium: 100 recent transactions</a>
+                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> Orca Whirlpools: 100 recent transactions</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <div>
+                        <div class="narrative-emoji">🐸</div>
+                        <div class="narrative-title">Meme Coins & Launchpads</div>
+                    </div>
+                    <div class="score-badge">82</div>
+                </div>
+                
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span>Confidence:</span>
+                        <span class="metric-value">81%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Signals:</span>
+                        <span class="metric-value">15</span>
+                    </div>
+                    <span class="momentum-badge momentum-rising">📈 Rising</span>
+                </div>
+                
+                <div class="strength-bar-container">
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: 81.69800000000001%"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span>Signal Strength</span>
+                        <span>82/100</span>
+                    </div>
+                </div>
+                
+                <div class="why-section">
+                    <div class="why-title">🎯 Why This Narrative is Emerging</div>
+                    <div class="why-text">Bonding curve innovation removed rug risk. Low friction = high velocity trading. Cultural moment for meme trading. Solana speed enables better trading UX.
+
+**Key Drivers:**
+• Cultural narrative stronger than fundamentals. Low barrier to participation. Community-driven price discovery. Entertainment ...</div>
+                </div>
+
+                <div class="evidence-section">
+                    <div class="evidence-title">Key Evidence:</div>
+                    <div class="evidence-pills">
+                        <span class="evidence-pill">$180M daily volume</span>
+                        <span class="evidence-pill">PUMP +34%</span>
+                        <span class="evidence-pill">Scale: 300K daily</span>
+                        <span class="evidence-pill">Growth: 34%</span>
+                    </div>
+                </div>
+
+                <div class="ideas-section">
+                    <div class="ideas-title">💡 Top Build Ideas</div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">Pump.fun Analytics Pro</div>
+                        <div class="idea-desc">Real-time analytics for pump.fun launches. Bonding curve analysis, whale detection, rug pull probability score, social s...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                            <span class="idea-tag">Premium subscription $20-50/mo</span>
+                        </div>
+                    </div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">Meme Token Sniper Bot</div>
+                        <div class="idea-desc">Bot that detects new pump.fun launches, analyzes creator wallet history, and auto-buys promising tokens within first blo...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Advanced</span>
+                            <span class="idea-tag">4-6 weeks</span>
+                            <span class="idea-tag">Trading profits or bot rentals</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="signals-section">
+                    <div class="signals-title">📡 Recent Signals:</div>
+                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> Pump.fun: 100 recent transactions</a>
+                    <a href="https://github.com/chainstacklabs/pumpfun-bonkfun-bot" class="signal" target="_blank"><span class="signal-icon">🐙</span> chainstacklabs/pumpfun-bonkfun-bot</a>
+                    <a href="https://github.com/cicere/pumpfun-bundler" class="signal" target="_blank"><span class="signal-icon">🐙</span> cicere/pumpfun-bundler</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <div>
+                        <div class="narrative-emoji">🏗️</div>
+                        <div class="narrative-title">Infrastructure Upgrades (Firedancer/Alpenglow)</div>
+                    </div>
+                    <div class="score-badge">77</div>
+                </div>
+                
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span>Confidence:</span>
+                        <span class="metric-value">90%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Signals:</span>
+                        <span class="metric-value">7</span>
+                    </div>
+                    <span class="momentum-badge momentum-rising">📈 Rising</span>
+                </div>
+                
+                <div class="strength-bar-container">
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: 76.506%"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span>Signal Strength</span>
+                        <span>77/100</span>
+                    </div>
+                </div>
+                
+                <div class="why-section">
+                    <div class="why-title">🎯 Why This Narrative is Emerging</div>
+                    <div class="why-text">Previous cycle exposed congestion issues. Institutional adoption requires enterprise-grade performance. Firedancer and Alpenglow address core scaling challenges.
+
+**Key Drivers:**
+• Previous cycle exposed congestion issues. Institutional adoption requires enterprise-grade performance. Competition fr...</div>
+                </div>
+
+                <div class="evidence-section">
+                    <div class="evidence-title">Key Evidence:</div>
+                    <div class="evidence-pills">
+                        <span class="evidence-pill">1000x compression</span>
+                        <span class="evidence-pill">Light Protocol</span>
+                        <span class="evidence-pill">Mainnet testing active</span>
+                        <span class="evidence-pill">Real-time network performance: 3,126 tra...</span>
+                    </div>
+                </div>
+
+                <div class="ideas-section">
+                    <div class="ideas-title">💡 Top Build Ideas</div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">Firedancer Node Dashboard</div>
+                        <div class="idea-desc">Real-time monitoring dashboard for Firedancer validators showing TPS, latency, block production stats, and comparison wi...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                            <span class="idea-tag">SaaS for validators ($50-200/m</span>
+                        </div>
+                    </div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">ZK Compression Migration Tool</div>
+                        <div class="idea-desc">One-click tool to migrate existing NFT collections and token accounts to compressed state. Calculates savings, handles m...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">4-5 weeks</span>
+                            <span class="idea-tag">Per-migration fees or enterpri</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="signals-section">
+                    <div class="signals-title">📡 Recent Signals:</div>
+                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> Solana Network: 3,126 TPS, 787 Validators</a>
+                    <a href="https://github.com/anza-xyz/solana-sdk" class="signal" target="_blank"><span class="signal-icon">🐙</span> anza-xyz/solana-sdk</a>
+                    <a href="https://github.com/alsk1992/CloddsBot" class="signal" target="_blank"><span class="signal-icon">🐙</span> alsk1992/CloddsBot</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <div>
+                        <div class="narrative-emoji">💵</div>
+                        <div class="narrative-title">Stablecoin Revolution & PayFi</div>
+                    </div>
+                    <div class="score-badge">72</div>
+                </div>
+                
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span>Confidence:</span>
+                        <span class="metric-value">90%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Signals:</span>
+                        <span class="metric-value">6</span>
+                    </div>
+                    <span class="momentum-badge momentum-rising">📈 Rising</span>
+                </div>
+                
+                <div class="strength-bar-container">
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: 72.11%"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span>Signal Strength</span>
+                        <span>72/100</span>
+                    </div>
+                </div>
+                
+                <div class="why-section">
+                    <div class="why-title">🎯 Why This Narrative is Emerging</div>
+                    <div class="why-text">Solana's low fees make micropayments economically viable. Legacy payment giants (Visa, Western Union) validating blockchain rails. Regulatory clarity emerging.
+
+**Key Drivers:**
+• Regulatory clarity emerging. Solana's speed matches remittance UX expectations. Legacy players forced to compete with cr...</div>
+                </div>
+
+                <div class="evidence-section">
+                    <div class="evidence-title">Key Evidence:</div>
+                    <div class="evidence-pills">
+                        <span class="evidence-pill">Market signal: $13.15B</span>
+                        <span class="evidence-pill">USDPT</span>
+                        <span class="evidence-pill">Visa settlement live</span>
+                        <span class="evidence-pill">Market signal: $700B</span>
+                    </div>
+                </div>
+
+                <div class="ideas-section">
+                    <div class="ideas-title">💡 Top Build Ideas</div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">AI Micropayment Orchestrator</div>
+                        <div class="idea-desc">SDK for AI agents to make and receive USDC micropayments. Handles batching, streaming payments, and cost optimization fo...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                            <span class="idea-tag">0.01% transaction fee at scale</span>
+                        </div>
+                    </div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">Cross-Border Remittance Tracker</div>
+                        <div class="idea-desc">Consumer app showing real-time USDC/USDPT remittance status, exchange rates, and fees vs Western Union traditional. Inte...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Beginner</span>
+                            <span class="idea-tag">2-3 weeks</span>
+                            <span class="idea-tag">Affiliate fees from payment pr</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="signals-section">
+                    <div class="signals-title">📡 Recent Signals:</div>
+                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> $13.15B Stablecoins on Solana</a>
+                    <a href="https://github.com/alsk1992/CloddsBot" class="signal" target="_blank"><span class="signal-icon">🐙</span> alsk1992/CloddsBot</a>
+                    <a href="https://github.com/cascade-protocol/sati" class="signal" target="_blank"><span class="signal-icon">🐙</span> cascade-protocol/sati</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <div>
+                        <div class="narrative-emoji">🤖</div>
+                        <div class="narrative-title">AI Agents & Autonomous Trading</div>
+                    </div>
+                    <div class="score-badge">72</div>
+                </div>
+                
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span>Confidence:</span>
+                        <span class="metric-value">72%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Signals:</span>
+                        <span class="metric-value">13</span>
+                    </div>
+                    <span class="momentum-badge momentum-rising">📈 Rising</span>
+                </div>
+                
+                <div class="strength-bar-container">
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: 71.51599999999999%"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span>Signal Strength</span>
+                        <span>72/100</span>
+                    </div>
+                </div>
+                
+                <div class="why-section">
+                    <div class="why-title">🎯 Why This Narrative is Emerging</div>
+                    <div class="why-text">LLM capabilities reached threshold for autonomous decision-making. Solana's sub-second finality enables real-time agent execution. ai16z proved the model works at scale.
+
+**Key Drivers:**
+• LLMs reached capability threshold for autonomous decision-making. Solana's sub-second finality enables real-ti...</div>
+                </div>
+
+                <div class="evidence-section">
+                    <div class="evidence-title">Key Evidence:</div>
+                    <div class="evidence-pills">
+                        <span class="evidence-pill">60+ pre-built actions</span>
+                        <span class="evidence-pill">Autonomous wallet control</span>
+                        <span class="evidence-pill">ai16z market cap $2B+</span>
+                        <span class="evidence-pill">4 competing frameworks</span>
+                    </div>
+                </div>
+
+                <div class="ideas-section">
+                    <div class="ideas-title">💡 Top Build Ideas</div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">AI Portfolio Rebalancer</div>
+                        <div class="idea-desc">An AI agent that monitors DeFi positions across Jupiter, Kamino, and Marinade, automatically rebalancing based on yield ...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                            <span class="idea-tag">0.1-0.5% management fee on AUM</span>
+                        </div>
+                    </div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">Social Signal Trading Bot</div>
+                        <div class="idea-desc">Agent that monitors KOL tweets (Mert, Toly, Akshay), analyzes sentiment, and executes trades on pump.fun tokens within s...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Advanced</span>
+                            <span class="idea-tag">4-6 weeks</span>
+                            <span class="idea-tag">Performance fees on profitable</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="signals-section">
+                    <div class="signals-title">📡 Recent Signals:</div>
+                    <a href="https://github.com/hanshaze/solana-sniper-copy-trading-bot" class="signal" target="_blank"><span class="signal-icon">🐙</span> hanshaze/solana-sniper-copy-trading-bot</a>
+                    <a href="https://github.com/alsk1992/CloddsBot" class="signal" target="_blank"><span class="signal-icon">🐙</span> alsk1992/CloddsBot</a>
+                    <a href="https://github.com/cascade-protocol/sati" class="signal" target="_blank"><span class="signal-icon">🐙</span> cascade-protocol/sati</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <div>
+                        <div class="narrative-emoji">📱</div>
+                        <div class="narrative-title">Mobile Web3 & Consumer Apps</div>
+                    </div>
+                    <div class="score-badge">71</div>
+                </div>
+                
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span>Confidence:</span>
+                        <span class="metric-value">75%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Signals:</span>
+                        <span class="metric-value">10</span>
+                    </div>
+                    <span class="momentum-badge momentum-rising">📈 Rising</span>
+                </div>
+                
+                <div class="strength-bar-container">
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: 71.086%"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span>Signal Strength</span>
+                        <span>71/100</span>
+                    </div>
+                </div>
+                
+                <div class="why-section">
+                    <div class="why-title">🎯 Why This Narrative is Emerging</div>
+                    <div class="why-text">Saga success proved demand for crypto phones. Hardware wallets solve UX. Token airdrops subsidize consumer adoption. Mobile-first generation entering crypto.
+
+**Key Drivers:**
+• Hardware costs dropped. Token incentives align contributors. Solana's speed enables real-time IoT coordination. Helium pro...</div>
+                </div>
+
+                <div class="evidence-section">
+                    <div class="evidence-title">Key Evidence:</div>
+                    <div class="evidence-pills">
+                        <span class="evidence-pill">40% mobile DEX trades</span>
+                        <span class="evidence-pill">1.8B token airdrop</span>
+                        <span class="evidence-pill">Bandwidth sharing</span>
+                        <span class="evidence-pill">Autonomous wallet control</span>
+                    </div>
+                </div>
+
+                <div class="ideas-section">
+                    <div class="ideas-title">💡 Top Build Ideas</div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">Seeker Rewards Aggregator</div>
+                        <div class="idea-desc">App that combines all Seeker-exclusive airdrops, quests, and rewards. Push notifications for new opportunities. Leaderbo...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Beginner</span>
+                            <span class="idea-tag">2-3 weeks</span>
+                            <span class="idea-tag">Promoted rewards from projects</span>
+                        </div>
+                    </div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">Mobile-First DEX Experience</div>
+                        <div class="idea-desc">Tinder-style token discovery for mobile. Swipe right to buy, left to pass. Optimized for Seeker's dApp store....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                            <span class="idea-tag">Trading fees affiliate</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="signals-section">
+                    <div class="signals-title">📡 Recent Signals:</div>
+                    <a href="https://github.com/OneKeyHQ/app-monorepo" class="signal" target="_blank"><span class="signal-icon">🐙</span> OneKeyHQ/app-monorepo</a>
+                    <a href="https://github.com/Web3Auth/Auth" class="signal" target="_blank"><span class="signal-icon">🐙</span> Web3Auth/Auth</a>
+                    <a href="https://github.com/ElliteAnts/Pumpfun-Volume-Bot" class="signal" target="_blank"><span class="signal-icon">🐙</span> ElliteAnts/Pumpfun-Volume-Bot</a>
+                </div>
+            </div>
+
+            <div class="narrative-card">
+                <div class="narrative-header">
+                    <div>
+                        <div class="narrative-emoji">🔐</div>
+                        <div class="narrative-title">ZK Compression & State Management</div>
+                    </div>
+                    <div class="score-badge">42</div>
+                </div>
+                
+                <div class="metrics-row">
+                    <div class="metric">
+                        <span>Confidence:</span>
+                        <span class="metric-value">57%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Signals:</span>
+                        <span class="metric-value">2</span>
+                    </div>
+                    <span class="momentum-badge momentum-declining">📉 Declining</span>
+                </div>
+                
+                <div class="strength-bar-container">
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: 42.0%"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span>Signal Strength</span>
+                        <span>42/100</span>
+                    </div>
+                </div>
+                
+                <div class="why-section">
+                    <div class="why-title">🎯 Why This Narrative is Emerging</div>
+                    <div class="why-text">State rent was blocking mass adoption experiments. Compressed NFTs proved concept. 1000x cost reduction unlocks new use cases. Now generalizing to all account types.
+
+**Key Drivers:**
+• State rent was blocking mass adoption experiments. Compressed NFTs proved concept. Now generalizing to all account...</div>
+                </div>
+
+                <div class="evidence-section">
+                    <div class="evidence-title">Key Evidence:</div>
+                    <div class="evidence-pills">
+                        <span class="evidence-pill">1000x compression</span>
+                        <span class="evidence-pill">Light Protocol</span>
+                        <span class="evidence-pill">Reduced validator costs</span>
+                        <span class="evidence-pill">Magic Eden leading with 50 recent trades...</span>
+                    </div>
+                </div>
+
+                <div class="ideas-section">
+                    <div class="ideas-title">💡 Top Build Ideas</div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">cNFT Migration Service</div>
+                        <div class="idea-desc">Batch migration tool converting legacy NFT collections to compressed NFTs. Cost calculator, metadata preservation, verif...</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">3-4 weeks</span>
+                            <span class="idea-tag">Per-NFT migration fee</span>
+                        </div>
+                    </div>
+
+                    <div class="idea-card">
+                        <div class="idea-name">Compressed Token Factory</div>
+                        <div class="idea-desc">No-code platform to launch compressed tokens with minimal costs. Includes airdrop tools, holder snapshots, analytics....</div>
+                        <div class="idea-meta">
+                            <span class="idea-tag">Intermediate</span>
+                            <span class="idea-tag">4-5 weeks</span>
+                            <span class="idea-tag">Token creation fees</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="signals-section">
+                    <div class="signals-title">📡 Recent Signals:</div>
+                    <a href="https://solscan.io" class="signal" target="_blank"><span class="signal-icon">⛓️</span> NFT Trading: 100 recent trades</a>
+                    <a href="https://letstalkbitco.in/solanas-v3-0-14-update-targets-mainnet-stability" class="signal" target="_blank"><span class="signal-icon">📰</span> ZK Compression v2: 1000x State Cost Reduction</a>
                 </div>
             </div>
 
@@ -475,26 +1130,35 @@
             <h2>🚀 Recommended Action Plan</h2>
 
             <div class="action-item">
-                <strong>1. Highest Priority:</strong> Focus on Infrastructure Upgrades (Firedancer/Alpenglow)<br>
-                <span style="color: var(--text-secondary);">Strongest signal with clearest opportunity</span>
-<br><span style="color: var(--sol-green);">→ Start with: Firedancer Node Dashboard</span></div>
-
-            <div class="action-item">
-                <strong>2. Secondary Focus:</strong> AI Agents & Autonomous Trading<br>
-                <span style="color: var(--text-secondary);">Strong momentum, good market timing</span>
+                <div class="action-number">1</div>
+                <div class="action-content">
+                    <div class="action-title">Highest Priority: DeFi Protocol Evolution</div>
+                    <div class="action-desc">Strength 89/100 with 90% confidence. Start with: Intent-Based Trading Interface</div>
+                </div>
             </div>
 
             <div class="action-item">
-                <strong>3. Monitor:</strong> Keep watching infrastructure upgrades (Firedancer/Alpenglow) for timing
+                <div class="action-number">2</div>
+                <div class="action-content">
+                    <div class="action-title">Secondary Focus: Meme Coins & Launchpads</div>
+                    <div class="action-desc">Rising momentum with solid on-chain validation. Good timing for builders.</div>
+                </div>
             </div>
+
             <div class="action-item">
-                <strong>4. Avoid:</strong> Oversaturated meme coin tools without differentiation
+                <div class="action-number">3</div>
+                <div class="action-content">
+                    <div class="action-title">Watch: Infrastructure Upgrades (Firedancer/Alpenglow)</div>
+                    <div class="action-desc">Emerging opportunity with growing signal strength. Monitor for timing.</div>
+                </div>
             </div>
+
         </div>
         
         <footer>
-            <p>Report generated by Solana Narrative Radar</p>
-            <p>Data sources: GitHub API, Brave Search, Ecosystem Research</p>
+            <p>Generated by <strong>Solana Narrative Radar v2.0</strong></p>
+            <p>Data sources: <a href="https://helius.xyz" target="_blank">Helius API</a> (on-chain), GitHub API, Ecosystem Research</p>
+            <p>Report generated: 2026-02-11 09:43 UTC</p>
         </footer>
     </div>
 </body>
