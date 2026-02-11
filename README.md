@@ -28,6 +28,10 @@ Based on the latest analysis:
 | 🏗️ Infrastructure (Firedancer) | 75/100 | 1M TPS, 150ms finality |
 | 📱 Mobile Web3 (Seeker) | 70/100 | 150K preorders, SKR token |
 
+## 🌐 Live Demo
+
+**[View the latest narrative report →](https://byte541.github.io/solana-narrative-radar/)**
+
 ## 🚀 Quick Start
 
 ```bash
